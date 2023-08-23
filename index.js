@@ -18,43 +18,47 @@ app.get('/', (req, res) => {
 })
 
 app.post('/find-id-by-marca', async (req, res) => {
-  const value = req.query.value
-  const pkey = req.query.key
+  try {
+    const value = req.query.value
+    const pkey = req.query.key
 
-  if (pkey !== KEY) return res.status(401).send('Unauthorized');  
-  const url = `https://api.webflow.com/collections/${MARCA_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
-  const data = await axios.get(url)
-  const filteredItems = filterItemByName(data.data.items, value)
+    if (pkey !== KEY) return res.status(401).send('Unauthorized');
+    const url = `https://api.webflow.com/collections/${MARCA_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
+    const data = await axios.get(url)
+    const filteredItems = filterItemByName(data.data.items, value)
+    return res.send(filteredItems).status(200)
+  } catch (error) {
+    return res.status(500).send("Server Error")
+  }
 
-  return res.json(filteredItems).status(200)
 })
 
 app.post('/find-id-by-combustivel', async (req, res) => {
-  const value = req.query.value
-  const pkey = req.query.key
+  try {
+    const value = req.query.value
+    const pkey = req.query.key
 
-  if (pkey !== KEY) return res.status(401).send('Unauthorized');  
-  const url = `https://api.webflow.com/collections/${COMBUSTIVEL_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
-  const data = await axios.get(url)
-  const filteredItems = filterItemByName(data.data.items, value)
+    if (pkey !== KEY) return res.status(401).send('Unauthorized');
+    const url = `https://api.webflow.com/collections/${COMBUSTIVEL_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
+    const data = await axios.get(url)
+    const filteredItems = filterItemByName(data.data.items, value)
+    return res.send(filteredItems).status(200)
 
-  return res.json(filteredItems).status(200)
+  } catch (error) {
+    return res.status(500).send("Server Error")
+  }
 })
 
 const filterItemByName = (items, value = "") => {
-  return items.filter((item) => {
-    return item.name.toLowerCase() == value.toLowerCase()
+  let targetItem = null
+  items.forEach(item => {
+    if (item.name.toLowerCase() == value.toLowerCase()) {
+      targetItem = item
+    }
   })
+
+  return targetItem["_id"]
 }
-
-app.post('/find-id-by-combustivel', (req, res) => {
-  const value = req.params.value
-  const pkey = req.params.key
-
-  if (pkey !== KEY) return res.status(401).send('Unauthorized');  
-
-
-})
 
 // Export the Express API
 module.exports = app
