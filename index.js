@@ -1,5 +1,6 @@
 require('dotenv').config()
 const { default: axios } = require('axios')
+const bodyParser = require('body-parser')
 const express = require('express')
 
 const app = express()
@@ -8,6 +9,9 @@ const WEBFLOW_KEY = process.env.WEBFLOW_ACCESS_TOKEN
 const KEY = process.env.KEY
 const MARCA_COLLECTION_ID = process.env.MARCA_COLLECTION_ID
 const COMBUSTIVEL_COLLECTION_ID = process.env.COMBUSTIVEL_COLLECTION_ID
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.listen(PORT, () => {
   console.log(`API listening on PORT ${PORT} `)
@@ -19,8 +23,8 @@ app.get('/', (req, res) => {
 
 app.post('/find-id-by-marca', async (req, res) => {
   try {
-    const value = req.query.value
-    const pkey = req.query.key
+    const value = req.body.value
+    const pkey = req.body.key
 
     if (pkey !== KEY) return res.status(401).send('Unauthorized');
     const url = `https://api.webflow.com/collections/${MARCA_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
@@ -35,8 +39,9 @@ app.post('/find-id-by-marca', async (req, res) => {
 
 app.post('/find-id-by-combustivel', async (req, res) => {
   try {
-    const value = req.query.value
-    const pkey = req.query.key
+    const value = req.body.value
+    const pkey = req.body.key
+
 
     if (pkey !== KEY) return res.status(401).send('Unauthorized');
     const url = `https://api.webflow.com/collections/${COMBUSTIVEL_COLLECTION_ID}/items?access_token=${WEBFLOW_KEY}`
@@ -45,7 +50,7 @@ app.post('/find-id-by-combustivel', async (req, res) => {
     return res.send(filteredItems).status(200)
 
   } catch (error) {
-    return res.status(500).send("Server Error")
+    return res.status(500).send(`Server Error: ${error.message}`)
   }
 })
 
